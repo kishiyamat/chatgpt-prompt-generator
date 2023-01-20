@@ -38,7 +38,10 @@ st.header("ChatGPT Prompt Generator")
 target_language = st.sidebar.header("PARAMETERS")
 target_language = "of " + st.sidebar.radio(
     "Select target language",
-    ('Japanese', 'English'))
+    (
+        'English',
+        'Japanese',
+    ))
 reader_student = "for " + st.sidebar.radio(
     "Select readers/students level",
     options=(
