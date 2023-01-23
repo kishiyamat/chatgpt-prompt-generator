@@ -11,13 +11,15 @@ class Request:
         base_label = f"N {self.request_type.lower()}"
         request_answers_str = " with answers" if self.request_answers else ""
         if self.request_type == "Vocab quizzes":
-            n_vocab_quizzes = self.pane.slider(label=base_label, min_value=3, max_value=10, value=3)
-            return f"make {str(n_vocab_quizzes)} vocab quizzes{request_answers_str}"
+            col1, col2 = self.pane.columns(2)
+            n_vocab_quizzes = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
+            m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
+            return f"make {str(n_vocab_quizzes)} vocabulary building quizzes with {m_choice} choices to ask synonyms, antonyms or hyponym{request_answers_str}"
         elif self.request_type == "Difficult words":
             # explanations は不要
             options = ["all"]+list(range(3, 21))
             n_difficult_words = self.pane.select_slider(label=base_label + " (all, 3, 4, 5,...20)", options=options, value="all")
-            return f"find {str(n_difficult_words)} difficult words"
+            return f"find {str(n_difficult_words)} difficult words except for proper nouns"
         elif self.request_type == "Comprehension tasks":
             col1, col2 = self.pane.columns(2)
             n_comprehension = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
