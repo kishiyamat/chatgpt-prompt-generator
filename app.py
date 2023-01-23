@@ -17,7 +17,7 @@ class Request:
             # explanations は不要
             options = ["all"]+list(range(3, 21))
             n_difficult_words = self.pane.select_slider(label=base_label + " (all, 3, 4, 5,...20)", options=options, value="all")
-            return f"find {str(n_difficult_words)} difficult words{request_answers_str}"
+            return f"find {str(n_difficult_words)} difficult words"
         elif self.request_type == "Comprehension tasks":
             col1, col2 = self.pane.columns(2)
             n_comprehension = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
@@ -26,7 +26,7 @@ class Request:
         elif self.request_type == "Discussion topics":
             col1, col2 = self.pane.columns(2)
             n_discussion_topics = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
-            m_minutes = col2.slider(label= "with M minutes", min_value=3, max_value=60, value=15)
+            m_minutes = col2.slider(label= "with M minutes", min_value=5, max_value=60, value=15, step=5)
             return f"suggest {str(n_discussion_topics)} discussion topics that is supposed to be finished in {m_minutes} minutes"
         elif self.request_type == "Word/phrase explanations":
             words_phrases = self.pane.text_input("Word/phrase")
@@ -42,7 +42,7 @@ st.header("ChatGPT Prompt Generator")
 st.markdown("""
 This app allows its users...
 1. To generate prompts for ChatGPT to make questions for language learners.
-1. To send the prompts to InstructGPT, a precedent model of ChatGPT.
+1. To try sending the prompts to InstructGPT, a precedent model of ChatGPT.
 """)
 
 target_language = st.sidebar.header("PARAMETERS")
@@ -52,7 +52,7 @@ target_language = "of " + st.sidebar.radio(
         'English',
         'Japanese',
     ))
-reader_student = "For " + st.sidebar.radio(
+reader_student = "for " + st.sidebar.radio(
     "Select readers/students level",
     options=(
         'Elementary learners',
@@ -79,6 +79,7 @@ answer_request = st.sidebar.radio("Do you need answers/explanations?", (
     "Yes, please.",
     "No, thank you.",
 ))
+answer_request=answer_request[0]=="Y"
 # answer_request = False
 
 request = Request(request_type, st.sidebar, answer_request).query
@@ -113,19 +114,24 @@ else:
 # - [ ] 単語数(上限不明)
 # - [ ] 参考文献
 st.subheader("Prompt")
-prompt = "".join([reader_student, " ", target_language, ", please", " ", request]) + reference_txt
+prompt = " ".join(["Please", request, reader_student, target_language]) + reference_txt
 st.markdown(prompt + "\n")
 
 if st.button('Submit to InstructGPT'):
     st.subheader("Output")
-    st.write("The following output is generated using InstructGPT, a precedent model of ChatGPT.")
+    st.info(" ".join([
+        "The following output is generated using InstructGPT, a precedent model of ChatGPT.",
+        "The response might not be complete due to the lack of computational resources."
+        ])
+    )
 
     openai.api_key = st.secrets["OPENAI_TOKEN"]
     response = openai.Completion.create(
         model='text-davinci-003',  # InstructGPT
         prompt=prompt,
         temperature=0.7,
-        max_tokens=512,  # これでも8問程度はいける
+        max_tokens= 1024,  # 
+        # max_tokens=512,  # これでも1段落で8問程度はいける
         # max_tokens=256,  # これだと3問程度
         top_p=1,
         frequency_penalty=0,
