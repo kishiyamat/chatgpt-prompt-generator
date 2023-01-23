@@ -48,7 +48,7 @@ answer_request=answer_request[0]=="Y"
 
 request = ""
 base_label = f"N {request_type.lower()}"
-request_answers_str = " with answers" if answer_request else ""
+request_answers_str = "with answers" if answer_request else ""
 
 if request_type == "Vocab quizzes":
     # - [x] subject
@@ -59,7 +59,8 @@ if request_type == "Vocab quizzes":
     x_nym = st.sidebar.radio(label= "X-nyms", options = ["a synonym", "an antonym"], horizontal=True)
     request = " ".join([
         f"make {n_vocab_quizzes} vocabulary-building quizzes",
-        f"where {subject} are supposed to find {x_nym} from {m_choice} choices{request_answers_str}"
+        f"where {subject} are supposed to find {x_nym} from {m_choice} choices",
+        f"{request_answers_str}"
     ]) 
 elif request_type == "Difficult words":
     # answer_request は不要
@@ -74,9 +75,12 @@ elif request_type == "Comprehension tasks":
     col1, col2 = st.sidebar.columns(2)
     n_comprehension = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
     m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
-    request = f"make {n_comprehension} comprehension tasks with {m_choice} choices{request_answers_str}"
+    request = " ".join([
+        f"make {n_comprehension} comprehension tasks with {m_choice} choices",
+        f"{request_answers_str}"
+    ])
 elif request_type == "Discussion topics":
-    # - [ ] subject
+    # - [x] subject
     # - [x] answer_request
     col1, col2 = st.sidebar.columns(2)
     n_discussion_topics = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
@@ -136,7 +140,8 @@ if st.button('Submit to InstructGPT'):
     st.info(" ".join([
         "The following output is generated using InstructGPT, a precedent model of ChatGPT.",
         "The response might not be complete due to the lack of computational resources."
-        "You can regenerate the responses from ChatGPT on the latest application."
+        "It may cost a couple of time to get a ready-to-use response.",
+        "You can regenerate the responses from ChatGPT on the latest application.",
         ])
     )
 
