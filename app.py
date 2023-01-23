@@ -31,8 +31,9 @@ subject = reader_student + " of " + target_language
 st.sidebar.subheader("Select the request type")
 request_type = st.sidebar.radio("Select request type", (
     "Vocab quizzes",
-    "Comprehension tasks",
     "Difficult words",
+    "Cloze tests",
+    "Comprehension tasks",
     "Discussion topics",
     "Word/phrase explanations",
     "Rewriting",
@@ -73,6 +74,15 @@ elif request_type == "Discussion topics":
     n_discussion_topics = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
     m_minutes = col2.slider(label= "with M minutes", min_value=5, max_value=60, value=15, step=5)
     request = f"suggest {str(n_discussion_topics)} discussion topics that is supposed to be finished in {m_minutes} minutes"
+elif request_type=="Cloze tests":
+    col1, col2 = st.sidebar.columns(2)
+    n_cloze_test = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
+    m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
+    pos = st.sidebar.radio(label= "PoS", options = ["preposition", "article"], horizontal=True)
+    request = " ".join([
+        f"make {n_cloze_test} cloze tests, each of which has a blank that students are supposed to fill in",
+        f"selecting a correct {pos} from {m_choice} choices"
+    ]) 
 elif request_type == "Word/phrase explanations":
     words_phrases = st.sidebar.text_input("Word/phrase")
     request = f'explain the use of "{words_phrases}" and give some other examples'
@@ -86,6 +96,7 @@ else:
 text_input = st.sidebar.text_area(label="Reference text input")
 text_input = "\n\n".join(text_input.split("\n"))
 reference_txt=f", reading the following text.\n\n{text_input}"
+# Please make questions each of which has a blank that students are supposed to fill in selecting a correct preposition such as for and on from four choices, reading the following article.
 
 # - [ ] 質問
 #     - [ ] 単語の説明
@@ -126,7 +137,8 @@ if st.button('Submit to InstructGPT'):
         presence_penalty=0
     )
 
-    st.markdown(body=(response['choices'][0]['text']).replace("\n", "\n\n"))
+    st.code(response['choices'][0]['text'])
+    # st.markdown(body=(response['choices'][0]['text']).replace("\n", "\n\n"))
 
 st.sidebar.markdown("If you have any questions, please email the following address.")
 st.sidebar.markdown("kishiyama.t@gmail.com")
