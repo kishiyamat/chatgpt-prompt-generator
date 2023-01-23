@@ -13,7 +13,8 @@ class Request:
             n_vocab_quizzes = self.pane.slider(label=base_label, min_value=3, max_value=10, value=3)
             return f"make {str(n_vocab_quizzes)} vocab quizzes"
         elif self.request_type == "Difficult words":
-            n_difficult_words = self.pane.slider(label=base_label, min_value=5, max_value=20, value=10)
+            options = ["all"]+list(range(3, 21))
+            n_difficult_words = self.pane.select_slider(label=base_label + " (all, 3, 4, 5,...20)", options=options, value="all")
             return f"find {str(n_difficult_words)} difficult words"
         elif self.request_type == "Comprehension tasks":
             col1, col2 = self.pane.columns(2)
@@ -107,7 +108,7 @@ st.markdown(prompt)
 
 if st.button('Submit to InstructGPT'):
     st.subheader("Output")
-    st.write("The following output is generated using InstructGPT, which is a precedent model of ChatGPT.")
+    st.write("The following output is generated using InstructGPT, a precedent model of ChatGPT.")
 
     openai.api_key = st.secrets["OPENAI_TOKEN"]
     response = openai.Completion.create(
@@ -122,3 +123,5 @@ if st.button('Submit to InstructGPT'):
 
     st.markdown(body=(response['choices'][0]['text']).replace("\n", "\n\n"))
 
+st.sidebar.markdown("If you have any questions, please email the following address.")
+st.sidebar.markdown("kishiyama.t@gmail.com")
