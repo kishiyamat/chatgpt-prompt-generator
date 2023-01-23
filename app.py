@@ -53,10 +53,10 @@ if request_type == "Vocab quizzes":
     col1, col2 = st.sidebar.columns(2)
     n_vocab_quizzes = col1.slider(label=base_label, min_value=2, max_value=6, value=3)
     m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
-    x_nym = st.sidebar.radio(label= "X-nyms", options = ["synonym", "antonym"], horizontal=True)
+    x_nym = st.sidebar.radio(label= "X-nyms", options = ["a synonym", "an antonym"], horizontal=True)
     request = " ".join([
-        f"make {str(n_vocab_quizzes)} vocabulary building quizzes",
-        f"where {subject} are supposed to find {x_nym}s from {m_choice} choices{request_answers_str}"
+        f"make {str(n_vocab_quizzes)} vocabulary-building quizzes",
+        f"where {subject} are supposed to find {x_nym} from {m_choice} choices{request_answers_str}"
     ]) 
 elif request_type == "Difficult words":
     # explanations は不要
