@@ -81,6 +81,7 @@ if reference=="N/A":
     reference_txt="."
 elif reference=="text":
     text_input = st.sidebar.text_area(label="Text input", value="<Reference text comes here>")
+    text_input = "\n\n".join(text_input.split("\n"))
     reference_txt=f", reading the following text.\n\n{text_input}"
 elif reference=="url":
     url_input = st.sidebar.text_input(label="URL input", value="<Reference URL comes here>")
@@ -102,7 +103,7 @@ else:
 st.subheader("Prompt")
 prompt = " ".join(["Please", request, reader_student, target_language]) + reference_txt
 # 見づらいのでデフォルトで text wrap したい
-st.write(prompt)
+st.markdown(prompt)
 
 if st.button('Submit to InstructGPT'):
     st.subheader("Output")
@@ -119,5 +120,5 @@ if st.button('Submit to InstructGPT'):
         presence_penalty=0
     )
 
-    st.code(body=(response['choices'][0]['text']),language=None)
+    st.markdown(body=(response['choices'][0]['text']).replace("\n", "\n\n"))
 
