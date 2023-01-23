@@ -2,25 +2,27 @@ import openai
 import streamlit as st
 
 class Request:
-    def __init__(self, request_type: str, pane)->None:
+    def __init__(self, request_type: str, pane, request_answers: bool)->None:
         self.request_type = request_type
         self.pane = pane
+        self.request_answers = request_answers
     @property
     def query(self)->str:
-        # FIXME: N==1 の場合は複数形を直す(N>=3に限定しているので問題ない)
         base_label = f"N {self.request_type.lower()}"
+        request_answers_str = " with answers" if self.request_answers else ""
         if self.request_type == "Vocab quizzes":
             n_vocab_quizzes = self.pane.slider(label=base_label, min_value=3, max_value=10, value=3)
-            return f"make {str(n_vocab_quizzes)} vocab quizzes"
+            return f"make {str(n_vocab_quizzes)} vocab quizzes{request_answers_str}"
         elif self.request_type == "Difficult words":
+            # explanations は不要
             options = ["all"]+list(range(3, 21))
             n_difficult_words = self.pane.select_slider(label=base_label + " (all, 3, 4, 5,...20)", options=options, value="all")
-            return f"find {str(n_difficult_words)} difficult words"
+            return f"find {str(n_difficult_words)} difficult words{request_answers_str}"
         elif self.request_type == "Comprehension tasks":
             col1, col2 = self.pane.columns(2)
             n_comprehension = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
             m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
-            return f"make {str(n_comprehension)} comprehension tasks with {m_choice} choices"
+            return f"make {str(n_comprehension)} comprehension tasks with {m_choice} choices{request_answers_str}"
         elif self.request_type == "Discussion topics":
             col1, col2 = self.pane.columns(2)
             n_discussion_topics = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
@@ -37,6 +39,11 @@ class Request:
             return "Error"
 
 st.header("ChatGPT Prompt Generator")
+st.markdown("""
+This app allows its users...
+1. To generate prompts for ChatGPT to make questions for language learners.
+1. To send the prompts to InstructGPT, a precedent model of ChatGPT.
+""")
 
 target_language = st.sidebar.header("PARAMETERS")
 target_language = "of " + st.sidebar.radio(
@@ -45,7 +52,7 @@ target_language = "of " + st.sidebar.radio(
         'English',
         'Japanese',
     ))
-reader_student = "for " + st.sidebar.radio(
+reader_student = "For " + st.sidebar.radio(
     "Select readers/students level",
     options=(
         'Elementary learners',
@@ -55,9 +62,6 @@ reader_student = "for " + st.sidebar.radio(
         'Native speakers',
         'Highly educated native speakers'
     ),).lower()
-# output_language = "In " + st.sidebar.radio(
-#     "Select output language",
-#     ('Japanese', 'English')) + ","
 
 st.sidebar.subheader("Select the request type")
 request_type = st.sidebar.radio("Select request type", (
@@ -70,22 +74,29 @@ request_type = st.sidebar.radio("Select request type", (
     "Summarizing",
 ))
 
-request = Request(request_type, st.sidebar).query
+# FIXME: 解答の解説機能があまり機能していない.
+answer_request = st.sidebar.radio("Do you need answers/explanations?", (
+    "Yes, please.",
+    "No, thank you.",
+))
+# answer_request = False
+
+request = Request(request_type, st.sidebar, answer_request).query
 
 reference = st.sidebar.radio(
     "Specify the reference",
     ("N/A", 'text')
-    # ("N/A", 'text', "url")
     )
 
+
 if reference=="N/A":
-    reference_txt="."
+    reference_txt=f"."
 elif reference=="text":
-    text_input = st.sidebar.text_area(label="Text input", value="<Reference text comes here>")
+    text_input = st.sidebar.text_area(label="Reference text input")
     text_input = "\n\n".join(text_input.split("\n"))
     reference_txt=f", reading the following text.\n\n{text_input}"
 elif reference=="url":
-    url_input = st.sidebar.text_input(label="URL input", value="<Reference URL comes here>")
+    url_input = st.sidebar.text_input(label="Reference URL input")
     reference_txt=f", reading the following text in the following url.\n\n{url_input}"
 else:
     raise NotImplementedError
@@ -102,9 +113,8 @@ else:
 # - [ ] 単語数(上限不明)
 # - [ ] 参考文献
 st.subheader("Prompt")
-prompt = " ".join(["Please", request, reader_student, target_language]) + reference_txt
-# 見づらいのでデフォルトで text wrap したい
-st.markdown(prompt)
+prompt = "".join([reader_student, " ", target_language, ", please", " ", request]) + reference_txt
+st.markdown(prompt + "\n")
 
 if st.button('Submit to InstructGPT'):
     st.subheader("Output")
@@ -115,7 +125,8 @@ if st.button('Submit to InstructGPT'):
         model='text-davinci-003',  # InstructGPT
         prompt=prompt,
         temperature=0.7,
-        max_tokens=256,
+        max_tokens=512,  # これでも8問程度はいける
+        # max_tokens=256,  # これだと3問程度
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0
