@@ -58,7 +58,7 @@ if request_type == "Vocab quizzes":
     m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
     x_nym = st.sidebar.radio(label= "X-nyms", options = ["a synonym", "an antonym"], horizontal=True)
     request = " ".join([
-        f"make {str(n_vocab_quizzes)} vocabulary-building quizzes",
+        f"make {n_vocab_quizzes} vocabulary-building quizzes",
         f"where {subject} are supposed to find {x_nym} from {m_choice} choices{request_answers_str}"
     ]) 
 elif request_type == "Difficult words":
@@ -67,21 +67,21 @@ elif request_type == "Difficult words":
     # - [x] answer_request
     options = ["all"]+list(range(3, 21))
     n_difficult_words = st.sidebar.select_slider(label=base_label + " (all, 3, 4, 5,...20)", options=options, value="all")
-    request = f"find {str(n_difficult_words)} words that {subject} don't know"
+    request = f"find {n_difficult_words} words that {subject} don't know"
 elif request_type == "Comprehension tasks":
     # - [ ] subject
     # - [x] answer_request
     col1, col2 = st.sidebar.columns(2)
     n_comprehension = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
     m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
-    request = f"make {str(n_comprehension)} comprehension tasks with {m_choice} choices{request_answers_str}"
+    request = f"make {n_comprehension} comprehension tasks with {m_choice} choices{request_answers_str}"
 elif request_type == "Discussion topics":
     # - [ ] subject
     # - [x] answer_request
     col1, col2 = st.sidebar.columns(2)
     n_discussion_topics = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
     m_minutes = col2.slider(label= "with M minutes", min_value=5, max_value=60, value=15, step=5)
-    request = f"suggest {str(n_discussion_topics)} discussion topics that {subject} is supposed to finish in {m_minutes} minutes"
+    request = f"suggest {n_discussion_topics} discussion topics that {subject} is supposed to finish in {m_minutes} minutes"
 elif request_type=="Cloze tests":
     # - [ ] subject
     # - [x] answer_request
