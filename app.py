@@ -12,9 +12,11 @@ class Request:
         request_answers_str = " with answers" if self.request_answers else ""
         if self.request_type == "Vocab quizzes":
             col1, col2 = self.pane.columns(2)
-            n_vocab_quizzes = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
+            n_vocab_quizzes = col1.slider(label=base_label, min_value=2, max_value=6, value=3)
             m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
-            return f"make {str(n_vocab_quizzes)} vocabulary building quizzes with {m_choice} choices to ask synonyms, antonyms or hyponym{request_answers_str}"
+            x_nym = self.pane.radio(label= "X-nyms", options = ["synonym", "antonym"], horizontal=True)
+            # x_nym = self.pane.radio(label= "X-nyms", options = ["synonym", "antonym", "hyponym", "hypernym"], horizontal=True)
+            return f"make {str(n_vocab_quizzes)} vocabulary building quizzes with {m_choice} choices to ask the {x_nym}{request_answers_str}"
         elif self.request_type == "Difficult words":
             # explanations は不要
             options = ["all"]+list(range(3, 21))
@@ -116,7 +118,8 @@ else:
 # - [ ] 単語数(上限不明)
 # - [ ] 参考文献
 st.subheader("Prompt")
-prompt = " ".join(["Please", request, reader_student, target_language]) + reference_txt
+prompt_a = " ".join(["Please", request, reader_student, target_language])
+prompt = prompt_a + reference_txt
 st.markdown(prompt + "\n")
 
 if st.button('Submit to InstructGPT'):
