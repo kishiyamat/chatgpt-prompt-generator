@@ -108,6 +108,7 @@ if st.button('Submit to InstructGPT'):
     st.info(" ".join([
         "The following output is generated using InstructGPT, a precedent model of ChatGPT.",
         "The response might not be complete due to the lack of computational resources."
+        "You can regenerate the responses from ChatGPT on the latest application."
         ])
     )
 
@@ -115,9 +116,10 @@ if st.button('Submit to InstructGPT'):
     response = openai.Completion.create(
         model='text-davinci-003',  # InstructGPT
         prompt=prompt,
-        temperature=0.7,
-        max_tokens= 1024,  # 
-        # max_tokens=512,  # これでも1段落で8問程度はいける
+        temperature=0.5,  # synonym は結構よさそう
+        # temperature=0.9,
+        # max_tokens= 1024,  # 
+        max_tokens=512,  # これでも1段落で8問程度はいける
         # max_tokens=256,  # これだと3問程度
         top_p=1,
         frequency_penalty=0,
