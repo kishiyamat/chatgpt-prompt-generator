@@ -22,7 +22,6 @@ reader_student = st.sidebar.radio(
         'Pre-intermediate learners',
         'Intermediate learners',
         'Advanced learners',
-        'Native speakers',
         'Highly educated native speakers'
     ),).lower()
 
@@ -55,12 +54,15 @@ if request_type == "Vocab quizzes":
     n_vocab_quizzes = col1.slider(label=base_label, min_value=2, max_value=6, value=3)
     m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
     x_nym = st.sidebar.radio(label= "X-nyms", options = ["synonym", "antonym"], horizontal=True)
-    request = f"make {str(n_vocab_quizzes)} vocabulary building quizzes with {m_choice} choices to ask {subject} the {x_nym}{request_answers_str}"
+    request = " ".join([
+        f"make {str(n_vocab_quizzes)} vocabulary building quizzes",
+        f"where {subject} are supposed to find {x_nym}s from {m_choice} choices{request_answers_str}"
+    ]) 
 elif request_type == "Difficult words":
     # explanations は不要
     options = ["all"]+list(range(3, 21))
     n_difficult_words = st.sidebar.select_slider(label=base_label + " (all, 3, 4, 5,...20)", options=options, value="all")
-    request = f"find {str(n_difficult_words)} difficult words except for proper nouns"
+    request = f"find {str(n_difficult_words)} words that {subject} don't know"
 elif request_type == "Comprehension tasks":
     col1, col2 = st.sidebar.columns(2)
     n_comprehension = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
@@ -81,22 +83,9 @@ elif request_type == "Summarizing":
 else:
     request = "Error"
 
-reference = st.sidebar.radio(
-    "Specify the reference",
-    ("N/A", 'text')
-    )
-
-if reference=="N/A":
-    reference_txt=f"."
-elif reference=="text":
-    text_input = st.sidebar.text_area(label="Reference text input")
-    text_input = "\n\n".join(text_input.split("\n"))
-    reference_txt=f", reading the following text.\n\n{text_input}"
-elif reference=="url":
-    url_input = st.sidebar.text_input(label="Reference URL input")
-    reference_txt=f", reading the following text in the following url.\n\n{url_input}"
-else:
-    raise NotImplementedError
+text_input = st.sidebar.text_area(label="Reference text input")
+text_input = "\n\n".join(text_input.split("\n"))
+reference_txt=f", reading the following text.\n\n{text_input}"
 
 # - [ ] 質問
 #     - [ ] 単語の説明
