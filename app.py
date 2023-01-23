@@ -51,6 +51,8 @@ base_label = f"N {request_type.lower()}"
 request_answers_str = " with answers" if answer_request else ""
 
 if request_type == "Vocab quizzes":
+    # - [x] subject
+    # - [x] answer_request
     col1, col2 = st.sidebar.columns(2)
     n_vocab_quizzes = col1.slider(label=base_label, min_value=2, max_value=6, value=3)
     m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
@@ -60,35 +62,50 @@ if request_type == "Vocab quizzes":
         f"where {subject} are supposed to find {x_nym} from {m_choice} choices{request_answers_str}"
     ]) 
 elif request_type == "Difficult words":
-    # explanations は不要
+    # answer_request は不要
+    # - [x] subject
+    # - [x] answer_request
     options = ["all"]+list(range(3, 21))
     n_difficult_words = st.sidebar.select_slider(label=base_label + " (all, 3, 4, 5,...20)", options=options, value="all")
     request = f"find {str(n_difficult_words)} words that {subject} don't know"
 elif request_type == "Comprehension tasks":
+    # - [ ] subject
+    # - [x] answer_request
     col1, col2 = st.sidebar.columns(2)
     n_comprehension = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
     m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
     request = f"make {str(n_comprehension)} comprehension tasks with {m_choice} choices{request_answers_str}"
 elif request_type == "Discussion topics":
+    # - [ ] subject
+    # - [x] answer_request
     col1, col2 = st.sidebar.columns(2)
     n_discussion_topics = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
     m_minutes = col2.slider(label= "with M minutes", min_value=5, max_value=60, value=15, step=5)
-    request = f"suggest {str(n_discussion_topics)} discussion topics that is supposed to be finished in {m_minutes} minutes"
+    request = f"suggest {str(n_discussion_topics)} discussion topics that {subject} is supposed to finish in {m_minutes} minutes"
 elif request_type=="Cloze tests":
+    # - [ ] subject
+    # - [x] answer_request
     col1, col2 = st.sidebar.columns(2)
     n_cloze_test = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
     m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
     pos = st.sidebar.radio(label= "PoS", options = ["preposition", "article"], horizontal=True)
+    # FIXME: students -> learners に変えてみる
     request = " ".join([
         f"make {n_cloze_test} cloze tests, each of which has a blank that students are supposed to fill in",
         f"selecting a correct {pos} from {m_choice} choices"
     ]) 
 elif request_type == "Word/phrase explanations":
+    # - [ ] subject
+    # - [x] answer_request
     words_phrases = st.sidebar.text_input("Word/phrase")
     request = f'explain the use of "{words_phrases}" and give some other examples'
 elif request_type == "Rewriting":
+    # - [ ] subject
+    # - [x] answer_request
     request = f'rewrite the text'
 elif request_type == "Summarizing":
+    # - [ ] subject
+    # - [x] answer_request
     request = f'summarize the text'
 else:
     request = "Error"
@@ -127,7 +144,7 @@ if st.button('Submit to InstructGPT'):
     response = openai.Completion.create(
         model='text-davinci-003',  # InstructGPT
         prompt=prompt,
-        temperature=0.5,  # synonym は結構よさそう
+        temperature=0.5,  # synonym は0.5くらいが結構よさそう
         # temperature=0.9,
         # max_tokens= 1024,  # 
         max_tokens=512,  # これでも1段落で8問程度はいける
