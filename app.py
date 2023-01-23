@@ -19,12 +19,12 @@ reader_student = st.sidebar.radio(
     "Select readers/students level",
     # FIXME: learners より students のほうが精度良いかも
     options=(
+        'Students',
         'Elementary learners',
         'Pre-intermediate learners',
         'Intermediate learners',
         'Advanced learners',
         'Highly educated native speakers',
-        'Students',
     ),).lower()
 
 subject = reader_student + " of " + target_language
@@ -117,7 +117,7 @@ elif request_type == "Summarizing":
 else:
     request = "Error"
 
-text_input = st.sidebar.text_area(label="Reference text input")
+text_input = st.sidebar.text_area(label="Reference text input", value="<You can edit here on the sidebar>")
 text_input = "\n\n".join(text_input.split("\n"))
 reference_txt=f", reading the following text.\n\n{text_input}"
 # Please make questions each of which has a blank that students are supposed to fill in selecting a correct preposition such as for and on from four choices, reading the following article.
@@ -136,7 +136,8 @@ reference_txt=f", reading the following text.\n\n{text_input}"
 st.subheader("Prompt")
 prompt_a = " ".join(["Please", request])
 prompt = prompt_a + reference_txt
-st.markdown(prompt + "\n")
+st.markdown(prompt + "\n\n")
+st.markdown("")
 
 if st.button('Submit to InstructGPT'):
     st.subheader("Output")
