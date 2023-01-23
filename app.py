@@ -51,7 +51,7 @@ answer_request=answer_request[0]=="Y"
 
 request = ""
 base_label = f"N {request_type.lower()}"
-request_answers_str = "(please tell me the answers at the bottom)" if answer_request else ""
+request_answers_str = " (please tell me the answers at the bottom)" if answer_request else ""
 
 if request_type == "Vocab quizzes":
     # - [x] subject
@@ -62,52 +62,74 @@ if request_type == "Vocab quizzes":
     xx_nym = f"{m_choice-1} antonyms" if x_nym=="a synonym" else f"{m_choice-1} synonyms" 
     request = " ".join([
         f"make {n_vocab_quizzes} vocabulary-building quizzes,",
-        f"where {subject} must distinguish {x_nym} from the other {xx_nym}"
-    ]) 
+        f"where {subject} must distinguish {x_nym} from the other {xx_nym},",
+        f"reading the following text{request_answers_str}.",
+    ])
 elif request_type == "Difficult words":
     # answer_request は不要
     # - [x] subject
     options = ["all"]+list(range(3, 21))
     n_difficult_words = st.sidebar.select_slider(label=base_label + " (all, 3, 4, 5,...20)", options=options, value="all")
-    request = f"find {n_difficult_words} words that {subject} don't know"
+    request = " ".join([
+        f"find {n_difficult_words} words that {subject} don't know,",
+        f"reading the following text{request_answers_str}.",
+    ])
 elif request_type == "Comprehension tasks":
-    # - [ ] subject
     col1, col2 = st.sidebar.columns(2)
     n_comprehension = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
     m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
     request = " ".join([
         f"make {n_comprehension} comprehension tasks with {m_choice} choices",
+        f"for {subject},",
+        f"reading the following text{request_answers_str}."
     ])
 elif request_type == "Discussion topics":
-    # - [x] subject
     col1, col2 = st.sidebar.columns(2)
     n_discussion_topics = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
     m_minutes = col2.slider(label= "with M minutes", min_value=5, max_value=60, value=15, step=5)
-    request = f"suggest {n_discussion_topics} discussion topics that {subject} are supposed to finish in {m_minutes} minutes"
+    request = " ".join([
+        f"suggest {n_discussion_topics} discussion topics",
+        f"that {subject} are supposed to finish in {m_minutes} minutes,",
+        f"reading the following text{request_answers_str}.",
+    ])
 elif request_type=="Cloze tests":
-    # - [ ] subject
     col1, col2 = st.sidebar.columns(2)
     n_cloze_test = col1.slider(label=base_label, min_value=3, max_value=10, value=3)
     m_choice = col2.slider(label= "with M choices", min_value=2, max_value=6, value=4)
     pos = st.sidebar.radio(label= "PoS", options = ["preposition", "noun", "adjective", "verb"], horizontal=True)
-    # FIXME: students -> learners に変えてみる
     request = " ".join([
         f"make {n_cloze_test} cloze tests, each of which has a blank that {subject} are supposed to fill in",
-        f"selecting a correct {pos} from {m_choice} choices"
+        f"selecting a correct {pos} from {m_choice} choices",
+        f"reading the following text{request_answers_str}.",
     ]) 
 elif request_type == "Word/phrase explanations":
     words_phrases = st.sidebar.text_input("Word/phrase")
-    request = f'explain the use of "{words_phrases}" and give some other examples'
+    st.info(f"answer request is disabled for this request_type: {request_type}")
+    request_answers_str = ""
+    request = " ".join([
+        f'explain the use of "{words_phrases}" and give some other examples,',
+        f"reading the following text{request_answers_str}.",
+    ]) 
 elif request_type == "Rewriting":
-    request = f'rewrite the text'
+    st.info(f"answer request is disabled for this request_type: {request_type}")
+    request_answers_str = ""
+    request = " ".join([
+        f'rewrite the text,',
+        f"reading the following text{request_answers_str}.",
+    ]) 
 elif request_type == "Summarizing":
-    request = f'summarize the text'
+    st.info(f"answer request is disabled for this request_type: {request_type}")
+    request_answers_str = ""
+    request = " ".join([
+        f'summarize the text,',
+        f"reading the following text{request_answers_str}.",
+    ]) 
 else:
-    request = "Error"
+    raise NotImplementedError
 
 text_input = st.sidebar.text_area(label="Reference text input", value="<You can edit here on the sidebar>")
 text_input = "\n\n".join(text_input.split("\n"))
-reference_txt=f", reading the following text{request_answers_str}.\n\n{text_input}"
+reference_txt=f"\n\n{text_input}"
 # Please make questions each of which has a blank that students are supposed to fill in selecting a correct preposition such as for and on from four choices, reading the following article.
 
 # - [ ] 質問
