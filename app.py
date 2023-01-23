@@ -1,3 +1,4 @@
+import openai
 import streamlit as st
 
 class Request:
@@ -33,6 +34,7 @@ class Request:
             return f'summarize the text'
         else:
             return "Error"
+
 st.header("ChatGPT Prompt Generator")
 
 target_language = st.sidebar.header("PARAMETERS")
@@ -97,6 +99,25 @@ else:
 #     - [ ] モード(Speaking/Writing)
 # - [ ] 単語数(上限不明)
 # - [ ] 参考文献
-st.subheader("Output")
-output = " ".join(["Please", request, reader_student, target_language]) + reference_txt
-st.write(output)
+st.subheader("Prompt")
+prompt = " ".join(["Please", request, reader_student, target_language]) + reference_txt
+# 見づらいのでデフォルトで text wrap したい
+st.write(prompt)
+
+if st.button('Submit to InstructGPT'):
+    st.subheader("Output")
+    st.write("The following output is generated using InstructGPT, which is a precedent model of ChatGPT.")
+
+    openai.api_key = st.secrets["OPENAI_TOKEN"]
+    response = openai.Completion.create(
+        model='text-davinci-003',  # InstructGPT
+        prompt=prompt,
+        temperature=0.7,
+        max_tokens=256,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+
+    st.code(body=(response['choices'][0]['text']),language=None)
+
