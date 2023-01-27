@@ -149,7 +149,7 @@ prompt = prompt_a + reference_txt
 st.markdown(prompt + "\n\n")
 st.markdown("")
 
-if st.button('Submit to InstructGPT'):
+if st.button('Submit it to InstructGPT'):
     st.subheader("Output")
     st.info(" ".join([
         "The following output is generated using InstructGPT, a precedent model of ChatGPT.",
